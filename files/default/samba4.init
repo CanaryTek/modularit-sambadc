@@ -1,0 +1,66 @@
+#! /bin/bash
+#
+# samba4 Bring up/down samba4 service
+#
+# chkconfig: - 90 10
+# description: Activates/Deactivates all samba4 interfaces configured to
+# start at boot time.
+#
+### BEGIN INIT INFO
+# Provides:
+# Should-Start:
+# Short-Description: Bring up/down samba4
+# Description: Bring up/down samba4
+### END INIT INFO
+# Source function library.
+. /etc/init.d/functions
+ 
+if [ -f /etc/sysconfig/samba4 ]; then
+. /etc/sysconfig/samba4
+fi
+ 
+CWD=$(pwd)
+prog="samba4"
+ 
+start() {
+# Attach irda device
+echo -n $"Starting $prog: "
+/usr/local/samba/sbin/samba
+sleep 2
+if ps ax | grep -v "grep" | grep -q /samba/sbin/samba ; then success $"samba4 startup"; else failure $"samba4 startup"; fi
+echo
+}
+stop() {
+# Stop service.
+echo -n $"Shutting down $prog: "
+killall samba
+sleep 2
+if ps ax | grep -v "grep" | grep -q /samba/sbin/samba ; then failure $"samba4 shutdown"; else success $"samba4 shutdown"; fi
+echo
+}
+status() {
+/usr/local/samba/sbin/samba --show-build
+}
+ 
+# See how we were called.
+case "$1" in
+start)
+start
+;;
+stop)
+stop
+;;
+status)
+status irattach
+;;
+restart|reload)
+stop
+start
+;;
+*)
+echo $"Usage: $0 {start|stop|restart|status}"
+exit 1
+esac
+ 
+exit 0
+

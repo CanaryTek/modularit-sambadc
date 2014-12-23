@@ -1,0 +1,13 @@
+Wed Aug 06 2014 12:02:59 GMT+0100 (WEST):
+[TypeError: Object #<Object> has no method 'imageDelete']
+TypeError: Object #<Object> has no method 'imageDelete'
+    at Object.exports.init (/usr/lib/node_modules/azure-cli/lib/commands/asm/vm._js:552:247)
+    at /usr/lib/node_modules/azure-cli/lib/cli.js:598:52
+    at Array.forEach (native)
+    at AzureCli._.extend.harvestPlugins (/usr/lib/node_modules/azure-cli/lib/cli.js:598:17)
+    at new AzureCli (/usr/lib/node_modules/azure-cli/lib/cli.js:59:10)
+    at Object.<anonymous> (/usr/lib/node_modules/azure-cli/bin/azure.js:19:11)
+    at Module._compile (module.js:456:26)
+    at Object.Module._extensions..js (module.js:474:10)
+    at Module.load (module.js:356:32)
+    at Function.Module._load (module.js:312:12)

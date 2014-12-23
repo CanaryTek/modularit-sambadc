@@ -1,0 +1,55 @@
+#!/bin/bash
+# Basic tests for Samba installation
+errors=0
+
+## DNS Checks
+echo
+echo "** Looking for SRV entry for kerberos"
+host -t SRV _kerberos._udp.<%= node['samba']['server']['realm'] %>
+[ "$?" -eq 0 ] || {
+  echo "  Test returned error code $?" 2>&1
+  let errors+=1
+}
+echo "** Looking for SRV entry for LDAP"
+host -t SRV _ldap._tcp.<%= node['samba']['server']['realm'] %>
+[ "$?" -eq 0 ] || {
+  echo "  Test returned error code $?" 2>&1
+  let errors+=1
+}
+
+## Authentication checks
+echo
+echo "** Checking for successfull authentication"
+ntlm_auth --username Administrator --password <%= node['samba']['server']['adminpass']  %>
+[ "$?" -eq 0 ] || {
+  echo "  Test returned error code $?" 2>&1
+  let errors+=1
+}
+echo "** Checking for unsuccessfull authentication"
+ntlm_auth --username Administrator --password none
+[ "$?" -ne 0 ] || {
+  echo "  Test returned error code $?" 2>&1
+  let errors+=1
+}
+
+## Access to wbinfo
+echo
+echo "** Checking for wbinfo users"
+wbinfo -u
+[ "$?" -eq 0 ] || {
+  echo "  Test returned error code $?" 2>&1
+  let errors+=1
+}
+echo "** Checking for wbinfo groups"
+wbinfo -g
+[ "$?" -eq 0 ] || {
+  echo "  Test returned error code $?" 2>&1
+  let errors+=1
+}
+
+# LAST: Report number of errors
+[ "$errors" -gt 0 ] && {
+  echo "There were $errors errors found"
+  exit 1
+}
+
