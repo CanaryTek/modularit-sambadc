@@ -1,0 +1,18 @@
+#!/bin/bash
+
+REALM="<%= node['samba']['server']['realm'] %>"
+HOSTNAME="<%= node['samba']['server']['hostname'] %>"
+DOMAIN="<%= node['samba']['server']['domain'] %>"
+SERVER_ROLE="<%= node['samba']['server']['role'] %>"
+ADMIN_PASS="<%= node['samba']['server']['adminpass'] %>"
+
+
+/usr/local/samba/bin/samba-tool domain provision --use-rfc2307 \
+        --realm ${REALM} \
+        --host-name ${HOSTNAME} \
+        --domain ${DOMAIN} \
+        --server-role ${SERVER_ROLE} \
+        --adminpass ${ADMIN_PASS}
+cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
+echo "search ${REALM}\nnameserver 127.0.0.1" > /etc/resolv.conf
+

@@ -1,17 +1,23 @@
 #!/bin/bash
+#
+# Config
+ADMINPASS="<%= node['samba']['server']['adminpass']  %>"
+REALM="<%= node['samba']['server']['realm'] %>"
+#BASEDN="DC=canarytek,DC=local"
+
 # Basic tests for Samba installation
 errors=0
 
 ## DNS Checks
 echo
 echo "** Looking for SRV entry for kerberos"
-host -t SRV _kerberos._udp.<%= node['samba']['server']['realm'] %>
+host -t SRV _kerberos._udp.$REALM
 [ "$?" -eq 0 ] || {
   echo "  Test returned error code $?" 2>&1
   let errors+=1
 }
 echo "** Looking for SRV entry for LDAP"
-host -t SRV _ldap._tcp.<%= node['samba']['server']['realm'] %>
+host -t SRV _ldap._tcp.$REALM
 [ "$?" -eq 0 ] || {
   echo "  Test returned error code $?" 2>&1
   let errors+=1
@@ -20,7 +26,7 @@ host -t SRV _ldap._tcp.<%= node['samba']['server']['realm'] %>
 ## Authentication checks
 echo
 echo "** Checking for successfull authentication"
-ntlm_auth --username Administrator --password <%= node['samba']['server']['adminpass']  %>
+ntlm_auth --username Administrator --password $ADMINPASS
 [ "$?" -eq 0 ] || {
   echo "  Test returned error code $?" 2>&1
   let errors+=1
@@ -47,9 +53,22 @@ wbinfo -g
   let errors+=1
 }
 
+## RFC2307 extensions
+#echo "** Checking for RFC2307 extensions"
+#ldbsearch -H /usr/local/samba/private/sam.ldb -s base -b CN=ypservers,CN=ypServ30,CN=RpcServices,CN=System,$BASEDN
+#[ "$?" -eq 0 ] || {
+#  echo "  Test returned error code $?" 2>&1
+#  let errors+=1
+#}
+
 # LAST: Report number of errors
-[ "$errors" -gt 0 ] && {
-  echo "There were $errors errors found"
+echo
+echo "Tests result:"
+if [ "$errors" -gt 0 ]; then
+  echo " There were $errors errors found"
   exit 1
-}
+else
+  echo " Everything seems OK. GOOD!!!"
+  exit 0
+fi
 

@@ -31,15 +31,6 @@ packages.each do |pkg|
   end
 end
 
-case node['platform']
-when "centos","redhat"
-  bash "Workaround for http://tickets.opscode.com/browse/COOK-1210" do 
-    code <<-EOH
-      echo 0 > /selinux/enforce
-    EOH
-  end
-end
-
 version = node['samba']['server']['version']
 
 remote_file "#{Chef::Config[:file_cache_path]}/#{node['samba']['server']['download_file']}" do
@@ -65,7 +56,7 @@ package "ntp"
 cookbook_file "/etc/ntp.conf" do
   source 'ntp.conf'
   mode 00644
-  notifies :reload, 'service[ntpd]'
+  notifies :restart, 'service[ntpd]'
 end
 
 directory "/usr/local/samba/var/lib/ntp_signd" do
@@ -84,33 +75,24 @@ cookbook_file "/etc/profile.d/samba.sh" do
   mode 00644
 end
 
-bash "provision-samba" do
-  code <<-EOH
-    /usr/local/samba/bin/samba-tool domain provision --use-rfc2307 \
-        --realm #{node['samba']['server']['realm']} \
-        --host-name #{node['samba']['server']['hostname']} \
-        --domain #{node['samba']['server']['domain']} \
-        --server-role #{node['samba']['server']['role']} \
-        --adminpass #{node['samba']['server']['adminpass']}
-    cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
-    echo "search #{node['samba']['server']['realm']}\nnameserver 127.0.0.1" > /etc/resolv.conf
-  EOH
-  creates "/usr/local/samba/etc/smb.conf"
-end
-
 # Samba service
 cookbook_file "/etc/init.d/samba4" do
   source 'samba4.init'
   mode 00755
-  notifies :reload, 'service[samba4]'
+#  notifies :reload, 'service[samba4]'
 end
 
-service "samba4" do
-  action [:start, :enable]
-end
+#service "samba4" do
+#  action [:start, :enable]
+#end
 
-## Scripts for testing
+## Scripts for deploying and testing
 directory "/root/bin"
+
+template "/root/bin/deploy_ad.sh" do
+  source "deploy_ad.sh.erb"
+  mode 00755
+end
 
 template "/root/bin/test_samba_basic.sh" do
   source "test_samba_basic.sh.erb"
