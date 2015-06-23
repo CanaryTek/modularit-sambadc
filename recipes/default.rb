@@ -17,6 +17,9 @@
 # limitations under the License.
 #
 
+# Add modularit-zimbra role
+node.run_list << "role[modularit-sambadc]"
+
 case node['platform']
 when "centos","redhat"
   include_recipe 'yum'
