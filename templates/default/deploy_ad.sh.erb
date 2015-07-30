@@ -14,5 +14,5 @@ ADMIN_PASS="<%= node['samba']['server']['adminpass'] %>"
         --server-role ${SERVER_ROLE} \
         --adminpass ${ADMIN_PASS}
 cp /usr/local/samba/private/krb5.conf /etc/krb5.conf
-echo "search ${REALM}\nnameserver 127.0.0.1" > /etc/resolv.conf
+echo -e "search ${REALM}\nnameserver 127.0.0.1" > /etc/resolv.conf
 
