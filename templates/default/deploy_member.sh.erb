@@ -1,0 +1,23 @@
+#!/bin/bash
+
+REALM="<%= node['samba']['server']['realm'] %>"
+HOSTNAME="<%= node['samba']['server']['hostname'] %>"
+DOMAIN="<%= node['samba']['server']['domain'] %>"
+SERVER_ROLE="<%= node['samba']['server']['role'] %>"
+ADMIN_PASS="<%= node['samba']['server']['adminpass'] %>"
+
+
+
+echo "Creating backup of smb.conf"
+cp /etc/samba/smb.conf /tmp/tmp_smb.conf.%%
+echo "Running authconfig the error is normal...."
+authconfig --disablecache --enablewinbind --enablewinbindauth --smbsecurity=ads --smbworkgroup=$DOMAIN \
+           --smbrealm=$REALM --enablewinbindusedefaultdomain --winbindtemplatehomedir=/home/%U \
+           --winbindtemplateshell=/bin/bash --enablekrb5 --krb5realm=$REALM --enablekrb5kdcdns \
+           --enablekrb5realmdns --enablelocauthorize --enablemkhomedir --enablepamaccess --updateall
+echo "Restoring smb.conf backup"
+cp /tmp/tmp_smb.conf.%% /etc/samba/smb.conf
+echo "Adding host to Domain. Enter password for adminsitrator"
+net ads join -U administrator
+echo "Restart winbind"
+service winbind restart
