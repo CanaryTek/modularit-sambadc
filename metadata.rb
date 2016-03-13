@@ -7,7 +7,7 @@ long_description  IO.read(File.join(File.dirname(__FILE__), 'README.md'))
 version           "0.1.0"
 recipe            "modularit-sambadc", "Installs and configures a Samba4 AD DC"
 
-%w{apt yum}.each do |pkg|
+%w{apt yum yum-epel}.each do |pkg|
   depends pkg
 end
 

@@ -10,7 +10,7 @@ default['samba']['server']['role'] = "dc"
 default['samba']['server']['adminpass'] = "P@ssW0rd01"
 
 ## Build time attributes. You should not need to change them
-default['samba']['server']['version'] = "4.2.4"
+default['samba']['server']['version'] = "4.2.7"
 default['samba']['server']['download_url'] = "http://ftp.samba.org/pub/samba"
 default['samba']['server']['download_file'] = "samba-#{node['samba']['server']['version']}.tar.gz"
 

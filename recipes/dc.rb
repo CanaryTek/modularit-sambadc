@@ -25,7 +25,7 @@ node.run_list << "role[modularit-sambadc]"
 case node['platform']
 when "centos","redhat"
   include_recipe 'yum'
-  include_recipe "yum::epel"
+  include_recipe "yum-epel"
 end
 
 # Install build dependencies
